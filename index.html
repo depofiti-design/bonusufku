@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="robots" content="noindex, nofollow, noarchive">
+<title>Bonus Ufku — Deneme Bonusu Rehberi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#05070d;
+  --card:#0a0e18;
+  --card2:#0f1524;
+  --green:#39ff88;
+  --cyan:#33d1ff;
+  --text:#eaf6ff;
+  --muted:#7f93ab;
+  --line:rgba(51,209,255,.18);
+  --gold:#ffcf5c;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{background:var(--bg);}
+body{
+  font-family:'IBM Plex Sans',sans-serif;color:var(--text);min-height:100vh;overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;display:flex;justify-content:center;
+  background:
+    linear-gradient(180deg, rgba(51,209,255,.08), transparent 30%),
+    radial-gradient(circle at 20% 100%, rgba(57,255,136,.10), transparent 45%),
+    var(--bg);
+}
+*{scrollbar-width:thin;scrollbar-color:rgba(51,209,255,.4) transparent;}
+.app{width:100%;max-width:460px;min-height:100vh;position:relative;padding-bottom:110px;}
+h1,h2,h3,.disp{font-family:'Sora',sans-serif;}
+
+/* horizon signature line */
+.horizon{position:absolute;top:210px;left:0;width:100%;height:1px;background:linear-gradient(90deg,transparent,var(--cyan),transparent);opacity:.35;z-index:0;}
+
+header{display:flex;align-items:center;justify-content:space-between;padding:18px 18px 10px;position:relative;z-index:2;}
+.logo{display:flex;align-items:center;gap:9px;font-family:'Sora';font-weight:700;font-size:19px;letter-spacing:-.3px;}
+.logo .bar{width:3px;height:18px;background:linear-gradient(var(--green),var(--cyan));border-radius:2px;}
+.logo span.sub{color:var(--cyan);}
+.icon-btn{width:38px;height:38px;border-radius:10px;background:var(--card2);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;}
+
+.ticker-wrap{margin:6px 18px 0;position:relative;z-index:2;}
+.ticker{background:linear-gradient(135deg, rgba(57,255,136,.12), rgba(51,209,255,.08));border:1px solid rgba(57,255,136,.28);border-radius:10px;padding:10px 14px;display:flex;align-items:center;gap:10px;font-size:12.5px;font-family:'IBM Plex Sans';animation:slideDown .4s ease;}
+@keyframes slideDown{from{opacity:0;transform:translateY(-6px);}to{opacity:1;transform:translateY(0);}}
+.ticker .pulse{width:7px;height:7px;border-radius:50%;background:var(--green);flex-shrink:0;box-shadow:0 0 8px var(--green);}
+.ticker b{color:var(--green);}
+
+.hero{margin:18px 18px 0;position:relative;z-index:2;background:linear-gradient(160deg,var(--card2),var(--card) 70%);border:1px solid var(--line);border-radius:16px;padding:22px 20px;overflow:hidden;}
+.hero::after{content:'';position:absolute;bottom:-30%;left:-10%;width:200px;height:200px;background:radial-gradient(circle,rgba(51,209,255,.18),transparent 70%);}
+.hero .eyebrow{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--cyan);font-weight:700;margin-bottom:8px;font-family:'Sora';}
+.hero h1{font-size:25px;line-height:1.25;font-weight:700;margin-bottom:8px;}
+.hero p{font-size:13px;color:var(--muted);margin-bottom:16px;max-width:290px;}
+.hero-cta{display:flex;gap:10px;position:relative;z-index:1;}
+.btn-primary{background:linear-gradient(135deg,var(--green),var(--cyan));color:#04140c;font-weight:700;border:none;padding:12px 18px;border-radius:10px;font-size:13.5px;cursor:pointer;box-shadow:0 8px 20px rgba(57,255,136,.2);}
+.btn-ghost{background:transparent;border:1px solid var(--line);color:var(--text);padding:12px 16px;border-radius:10px;font-size:13.5px;cursor:pointer;}
+
+.filters{display:flex;gap:8px;padding:18px 18px 6px;position:relative;z-index:2;}
+.pill{padding:8px 16px;border-radius:8px;border:1px solid var(--line);background:var(--card2);color:var(--muted);font-size:12.5px;font-weight:600;white-space:nowrap;cursor:pointer;}
+.pill.active{background:linear-gradient(135deg,var(--green),var(--cyan));color:#04140c;border-color:transparent;}
+
+.sec-head{display:flex;align-items:center;gap:8px;padding:20px 18px 10px;position:relative;z-index:2;}
+.sec-head .line{flex:1;height:1px;background:var(--line);}
+.sec-head h2{font-size:13.5px;font-weight:600;color:var(--cyan);letter-spacing:.3px;font-family:'Sora';}
+
+.sites{padding:0 18px;display:flex;flex-direction:column;gap:10px;position:relative;z-index:2;}
+.site-card{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;}
+.site-logo{width:52px;height:52px;border-radius:10px;flex-shrink:0;background:linear-gradient(150deg,#132038,#0a1220);display:flex;align-items:center;justify-content:center;font-family:'Sora';font-weight:700;font-size:11px;color:var(--green);border:1px solid rgba(57,255,136,.25);text-align:center;}
+.site-info{flex:1;min-width:0;}
+.site-name-row{display:flex;align-items:center;gap:6px;margin-bottom:2px;}
+.site-name{font-size:14px;font-weight:700;}
+.badge{font-size:9px;font-weight:800;padding:2px 7px;border-radius:5px;letter-spacing:.4px;}
+.badge.trend{background:rgba(255,207,92,.16);color:var(--gold);}
+.badge.pop{background:rgba(51,209,255,.16);color:var(--cyan);}
+.site-bonus{font-family:'Sora';font-size:16px;font-weight:700;color:var(--green);}
+.site-type{font-size:11px;color:var(--muted);}
+.cta-btn{background:linear-gradient(135deg,var(--green),var(--cyan));color:#04140c;font-weight:700;font-size:12px;border:none;padding:10px 14px;border-radius:9px;cursor:pointer;white-space:nowrap;}
+
+.fab-bar{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);width:calc(100% - 36px);max-width:424px;z-index:40;background:rgba(10,14,24,.88);backdrop-filter:blur(14px);border:1px solid var(--line);border-radius:16px;padding:10px;display:flex;gap:8px;box-shadow:0 12px 30px rgba(0,0,0,.5);}
+.fab{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 4px;border-radius:12px;cursor:pointer;color:var(--muted);font-size:10.5px;font-weight:600;}
+.fab.active-fab{background:var(--card2);color:var(--cyan);}
+.fab .fico{font-size:19px;}
+
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(2,4,8,.82);backdrop-filter:blur(4px);z-index:100;align-items:center;justify-content:center;padding:20px;}
+.modal-bg.show{display:flex;}
+.modal{background:linear-gradient(165deg,var(--card2),var(--card));border:1px solid var(--line);border-radius:18px;padding:22px;width:100%;max-width:340px;text-align:center;position:relative;}
+.modal .close{position:absolute;top:14px;right:14px;width:28px;height:28px;border-radius:8px;background:var(--card);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--muted);}
+.modal h3{font-size:18px;margin:4px 0 6px;font-family:'Sora';}
+.modal p.sub{font-size:12.5px;color:var(--muted);margin-bottom:16px;}
+
+#wheelSvg{width:240px;height:240px;margin:0 auto;transition:transform 4s cubic-bezier(.17,.67,.16,.99);}
+.wheel-pointer{width:0;height:0;border-left:10px solid transparent;border-right:10px solid transparent;border-top:16px solid var(--green);margin:0 auto -6px;position:relative;z-index:2;}
+
+.chest-row{display:flex;gap:12px;justify-content:center;margin:18px 0;}
+.chest-btn{background:transparent;border:none;cursor:pointer;padding:10px;border-radius:12px;transition:.2s;}
+.chest-btn svg{width:64px;height:64px;}
+.chest-btn.dimmed{opacity:.25;pointer-events:none;}
+.chest-btn.selected{background:rgba(57,255,136,.1);transform:scale(1.05);}
+
+.win-amount{font-family:'Sora';font-size:34px;font-weight:700;color:var(--green);margin:10px 0 2px;}
+.win-site{font-size:13px;color:var(--muted);margin-bottom:18px;}
+
+#blockScreen{display:none;position:fixed;inset:0;background:var(--bg);z-index:9999;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:30px;}
+#blockScreen.show{display:flex;}
+#blockScreen h2{font-family:'Sora';font-size:22px;color:#ff5c7a;margin-bottom:10px;}
+#blockScreen p{color:var(--muted);font-size:13px;max-width:280px;}
+
+@media(max-width:380px){.hero h1{font-size:22px;}}
+</style>
+</head>
+<body>
+
+<div id="blockScreen">
+  <h2>Sinyal Kesildi</h2>
+  <p>Geliştirici araçları açıkken bu içerik görüntülenemez. Paneli kapatın ve tekrar deneyin.</p>
+</div>
+
+<div class="app">
+  <div class="horizon"></div>
+
+  <header>
+    <div class="logo"><span class="bar"></span>Bonus<span class="sub">Ufku</span></div>
+    <div class="icon-btn">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#33d1ff" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+    </div>
+  </header>
+
+  <div class="ticker-wrap">
+    <div class="ticker" id="ticker">
+      <span class="pulse"></span>
+      <span id="tickerUser">ay****17</span> az önce <b id="tickerAmount">~3.747 TL</b> kazandı
+    </div>
+  </div>
+
+  <div class="hero">
+    <div class="eyebrow">Ufuk Taraması</div>
+    <h1>Kazancın ufkunu<br>birlikte tarayalım.</h1>
+    <p>Güvenilir siteleri karşılaştır, çarkı çevir, sinyali yakala.</p>
+    <div class="hero-cta">
+      <button class="btn-primary" onclick="openWheel()">Çarkı Çevir</button>
+      <button class="btn-ghost" onclick="openTreasure()">Sinyali Yakala</button>
+    </div>
+  </div>
+
+  <div class="filters">
+    <div class="pill active" onclick="setFilter('all',this)">Tümü</div>
+    <div class="pill" onclick="setFilter('trend',this)">Trend</div>
+    <div class="pill" onclick="setFilter('popular',this)">Popüler</div>
+  </div>
+
+  <div class="sec-head"><div class="line"></div><h2>Trend Siteler</h2><div class="line"></div></div>
+  <div class="sites" id="trendList"></div>
+
+  <div class="sec-head"><div class="line"></div><h2>Popüler Siteler</h2><div class="line"></div></div>
+  <div class="sites" id="popList"></div>
+
+  <div style="height:30px;"></div>
+</div>
+
+<div class="fab-bar">
+  <div class="fab active-fab"><span class="fico">⌂</span>Anasayfa</div>
+  <div class="fab" onclick="openWheel()"><span class="fico">◉</span>Çark</div>
+  <div class="fab" onclick="openTreasure()"><span class="fico">◈</span>Sinyal</div>
+  <div class="fab"><span class="fico">✉</span>İletişim</div>
+</div>
+
+<div class="modal-bg" id="wheelModal">
+  <div class="modal">
+    <div class="close" onclick="closeModal('wheelModal')">✕</div>
+    <h3>Ufuk Çarkı</h3>
+    <p class="sub">Çevir, sinyali yakala.</p>
+    <div class="wheel-pointer"></div>
+    <svg id="wheelSvg" viewBox="0 0 200 200"></svg>
+    <button class="btn-primary" style="width:100%;margin-top:18px;" id="spinBtn" onclick="spinWheel()">Çevir</button>
+  </div>
+</div>
+
+<div class="modal-bg" id="winModal">
+  <div class="modal">
+    <div class="close" onclick="closeModal('winModal')">✕</div>
+    <h3>◉ Sinyal Yakalandı</h3>
+    <div class="win-amount" id="winPrize">500 TL</div>
+    <div class="win-site" id="winSite">SiteAdı</div>
+    <a href="#" target="_blank" class="btn-primary" style="display:block;width:100%;text-decoration:none;" id="winLink">Bonusu Al</a>
+  </div>
+</div>
+
+<div class="modal-bg" id="treasureModal">
+  <div class="modal">
+    <div class="close" onclick="closeModal('treasureModal')">✕</div>
+    <div id="treasureContent">
+      <h3>Üç Sinyal</h3>
+      <p class="sub">Birini seç, tara.</p>
+      <div class="chest-row">
+        <button class="chest-btn" id="chest0" onclick="pickChest(0)"></button>
+        <button class="chest-btn" id="chest1" onclick="pickChest(1)"></button>
+        <button class="chest-btn" id="chest2" onclick="pickChest(2)"></button>
+      </div>
+    </div>
+    <div id="treasureResult" style="display:none;">
+      <h3>◈ Yakalandı</h3>
+      <div class="win-amount" id="wonAmount">250 TL</div>
+      <div class="win-site" id="wonSite">SiteAdı</div>
+      <a href="#" target="_blank" class="btn-primary" style="display:block;width:100%;text-decoration:none;" id="wonLink">Bonusu Al</a>
+    </div>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+<script>
+/* ============ FIREBASE AYARLARI ============ */
+const firebaseConfig = {
+  apiKey: "AIzaSyDrXOlpkMV8Ee87PTHCCux5twOrzSypLKg",
+  authDomain: "bonusufku.firebaseapp.com",
+  projectId: "bonusufku",
+  storageBucket: "bonusufku.firebasestorage.app",
+  messagingSenderId: "1083260845030",
+  appId: "1:1083260845030:web:783038610c91103e123427"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+/* Firestore'a ulaşılamazsa gösterilecek yedek liste */
+let SITES = [
+  {name:"NovaBet", bonus:"500", type:"Deneme Bonusu", tag:"trend", link:"#"},
+  {name:"KristalBet", bonus:"1.000", type:"Deneme Bonusu", tag:"trend", link:"#"},
+  {name:"ZirveBahis", bonus:"750", type:"Hoş Geldin Bonusu", tag:"trend", link:"#"},
+  {name:"AtlasCasino", bonus:"2.000", type:"Deneme Bonusu", tag:"popular", link:"#"},
+  {name:"VeloBet", bonus:"300", type:"Freespin Bonusu", tag:"popular", link:"#"},
+];
+function renderCard(s){
+  const badge = s.tag==='trend' ? '<span class="badge trend">TREND</span>' : '<span class="badge pop">POPÜLER</span>';
+  const logoInner = s.logo
+    ? `<img src="${s.logo}" alt="${s.name}" style="width:100%;height:100%;object-fit:contain;border-radius:inherit;" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"><span style="display:none;width:100%;height:100%;align-items:center;justify-content:center;">${s.name.slice(0,2).toUpperCase()}</span>`
+    : s.name.slice(0,2).toUpperCase();
+  return `<div class="site-card">
+    <div class="site-logo">${logoInner}</div>
+    <div class="site-info">
+      <div class="site-name-row"><span class="site-name">${s.name}</span>${badge}</div>
+      <div class="site-bonus">${s.bonus} <span style="font-size:11px;color:var(--muted);font-family:'IBM Plex Sans';">TL</span></div>
+      <div class="site-type">${s.type}</div>
+    </div>
+    <a href="${s.link}" target="_blank" class="cta-btn">Bonusu Al</a>
+  </div>`;
+}
+function render(filter='all'){
+  const trends = SITES.filter(s=>s.tag==='trend' && (filter==='all'||filter==='trend'));
+  const pops = SITES.filter(s=>s.tag==='popular' && (filter==='all'||filter==='popular'));
+  document.getElementById('trendList').innerHTML = trends.map(renderCard).join('');
+  document.getElementById('popList').innerHTML = pops.map(renderCard).join('');
+}
+function setFilter(f, el){
+  document.querySelectorAll('.pill').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active');
+  render(f);
+}
+const names=['ay','em','me','se','ka','bu','ha','al','oz','de'];
+const amounts=[3747,2269,4770,1850,5200,890,12500,3333,7777,999];
+function tick(){
+  const n = names[Math.floor(Math.random()*names.length)];
+  const s = String(Math.floor(Math.random()*99)).padStart(2,'0');
+  const a = amounts[Math.floor(Math.random()*amounts.length)];
+  const el = document.getElementById('ticker');
+  el.style.animation='none'; void el.offsetWidth; el.style.animation='slideDown .4s ease';
+  document.getElementById('tickerUser').textContent = `${n}****${s}`;
+  document.getElementById('tickerAmount').textContent = `~${a.toLocaleString('tr-TR')} TL`;
+}
+setInterval(tick, 5000);
+
+const wheelColors=["#39ff88","#2ee377","#33d1ff","#22a8cc","#ffcf5c","#e0b04a","#7de6b0","#5cc4e8"];
+let wheelData=[];
+function buildWheel(){
+  const pool = SITES.filter(s=>s.tag==='trend'||s.tag==='popular');
+  wheelData = Array.from({length:8}, (_,i)=> pool[i % pool.length]);
+  let html='';
+  for(let i=0;i<8;i++){
+    const sA=(i*45-90)*Math.PI/180, eA=((i+1)*45-90)*Math.PI/180;
+    const x1=100+95*Math.cos(sA), y1=100+95*Math.sin(sA);
+    const x2=100+95*Math.cos(eA), y2=100+95*Math.sin(eA);
+    const tA=(i*45+22.5-90)*Math.PI/180;
+    const tx=100+62*Math.cos(tA), ty=100+62*Math.sin(tA);
+    html+=`<path d="M100,100 L${x1},${y1} A95,95 0 0,1 ${x2},${y2} Z" fill="${wheelColors[i]}" stroke="#05070d" stroke-width="2"/>
+    <text x="${tx}" y="${ty}" fill="#04140c" font-size="9" font-weight="700" text-anchor="middle" transform="rotate(${i*45+22.5},${tx},${ty})">${wheelData[i].bonus} TL</text>`;
+  }
+  html+=`<circle cx="100" cy="100" r="24" fill="#39ff88" stroke="#2ee377" stroke-width="3"/>
+  <text x="100" y="100" font-size="9" font-weight="700" text-anchor="middle" dominant-baseline="middle" fill="#04140c">ÇEVİR</text>`;
+  document.getElementById('wheelSvg').innerHTML = html;
+}
+
+/* ============ FIRESTORE'DAN VERİ YÜKLE ============ */
+async function loadSites(){
+  try{
+    const snap = await db.collection('sites').where('active', '==', true).get();
+    if(!snap.empty){
+      const rows = snap.docs.map(d => ({id:d.id, ...d.data()}));
+      rows.sort((a,b) => (a.display_order||0) - (b.display_order||0));
+      SITES = rows.map(d => ({name:d.name, bonus:d.bonus, type:d.type, tag:d.tag, link:d.link||'#', logo:d.logo||''}));
+    }
+  }catch(e){ console.warn('Firestore yüklenemedi, yedek liste kullanılıyor.', e); }
+  render();
+  buildWheel();
+}
+loadSites();
+let spinning=false;
+function spinWheel(){
+  if(spinning) return; spinning=true;
+  document.getElementById('spinBtn').textContent='Çevriliyor...';
+  const idx = Math.floor(Math.random()*8);
+  const rot = 360*5 + (360 - (idx*45+22.5));
+  const svg = document.getElementById('wheelSvg');
+  svg.style.transform = `rotate(${rot}deg)`;
+  setTimeout(()=>{
+    closeModal('wheelModal');
+    const w = wheelData[idx];
+    document.getElementById('winPrize').textContent = w.bonus + ' TL';
+    document.getElementById('winSite').textContent = w.name;
+    document.getElementById('winLink').href = w.link;
+    openModal('winModal');
+    spinning=false;
+    document.getElementById('spinBtn').textContent='Çevir';
+    svg.style.transition='none'; svg.style.transform='rotate(0deg)';
+    setTimeout(()=>svg.style.transition='transform 4s cubic-bezier(.17,.67,.16,.99)',50);
+  },4000);
+}
+
+const chestClosedSVG = `<svg viewBox="0 0 64 64"><rect x="6" y="30" width="52" height="30" rx="6" fill="#132038" stroke="#0a1220" stroke-width="2"/><rect x="6" y="38" width="52" height="5" fill="#1a2c4d"/><rect x="26" y="34" width="12" height="14" rx="4" fill="#39ff88" stroke="#2ee377" stroke-width="1"/><path d="M6 30 L32 8 L58 30 L58 36 L32 16 L6 36 Z" fill="#1a2c4d" stroke="#0a1220" stroke-width="2"/></svg>`;
+function pickChest(idx){
+  [0,1,2].forEach(i=>{
+    const c=document.getElementById('chest'+i);
+    c.disabled=true;
+    c.className = i===idx ? 'chest-btn selected':'chest-btn dimmed';
+  });
+  setTimeout(()=>{
+    document.getElementById('treasureContent').style.display='none';
+    const w = SITES[Math.floor(Math.random()*SITES.length)];
+    document.getElementById('wonAmount').textContent = w.bonus+' TL';
+    document.getElementById('wonSite').textContent = w.name;
+    document.getElementById('wonLink').href = w.link;
+    document.getElementById('treasureResult').style.display='block';
+  },1200);
+}
+function openTreasure(){
+  document.getElementById('treasureContent').style.display='block';
+  document.getElementById('treasureResult').style.display='none';
+  [0,1,2].forEach(i=>{ const c=document.getElementById('chest'+i); c.className='chest-btn'; c.disabled=false; c.innerHTML=chestClosedSVG; });
+  openModal('treasureModal');
+}
+
+function openModal(id){ document.getElementById(id).classList.add('show'); }
+function closeModal(id){ document.getElementById(id).classList.remove('show'); }
+function openWheel(){ openModal('wheelModal'); }
+
+(function(){
+  const threshold = 160;
+  let triggered = false;
+  function check(){
+    const wDiff = window.outerWidth - window.innerWidth;
+    const hDiff = window.outerHeight - window.innerHeight;
+    if(wDiff > threshold || hDiff > threshold){
+      if(!triggered){ triggered = true; document.getElementById('blockScreen').classList.add('show'); }
+    } else {
+      if(triggered){ triggered = false; document.getElementById('blockScreen').classList.remove('show'); }
+    }
+  }
+  setInterval(check, 700);
+  window.addEventListener('resize', check);
+})();
+</script>
+</body>
+</html>

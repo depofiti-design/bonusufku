@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Bonus Ufku — Yönetim Paneli</title>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+<style>
+:root{--bg:#05070d;--card:#0a0e18;--card2:#0f1524;--lilac:#33d1ff;--gold:#39ff88;--text:#eaf6ff;--muted:#7f93ab;--line:rgba(51,209,255,.18);--red:#ff5c7a;--green:#39ff88;}
+*{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,'Inter',sans-serif;}
+body{background:var(--bg);color:var(--text);min-height:100vh;padding:24px;}
+.wrap{max-width:920px;margin:0 auto;}
+h1{font-size:20px;margin-bottom:4px;}
+p.sub{color:var(--muted);font-size:13px;margin-bottom:22px;}
+input,select{background:var(--card2);border:1px solid var(--line);color:var(--text);padding:9px 11px;border-radius:8px;font-size:13px;width:100%;}
+button{cursor:pointer;border:none;border-radius:8px;font-weight:700;font-size:13px;padding:9px 14px;}
+.btn-primary{background:linear-gradient(135deg,var(--lilac),#8f5fe8);color:#fff;}
+.btn-danger{background:rgba(255,103,103,.15);color:var(--red);}
+.btn-ghost{background:var(--card2);color:var(--text);border:1px solid var(--line);}
+
+#gate{max-width:340px;margin:80px auto;text-align:center;}
+#gate input{margin-bottom:10px;}
+
+#panel{display:none;}
+.add-form{display:grid;grid-template-columns:1.2fr 1fr 1.2fr 1fr 1.6fr .8fr;gap:8px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:20px;}
+.add-form button{grid-column:span 6;}
+table{width:100%;border-collapse:collapse;background:var(--card);border-radius:12px;overflow:hidden;}
+th,td{padding:10px 12px;text-align:left;font-size:12.5px;border-bottom:1px solid var(--line);}
+th{color:var(--muted);font-weight:600;text-transform:uppercase;font-size:10.5px;letter-spacing:.4px;}
+td input,td select{padding:6px 8px;font-size:12px;}
+.row-actions{display:flex;gap:6px;}
+.status-msg{font-size:12px;color:var(--green);margin-bottom:12px;min-height:16px;}
+</style>
+</head>
+<body>
+
+<div id="gate">
+  <h1>Bonus Ufku Yönetim</h1>
+  <p class="sub">Devam etmek için şifre gir.</p>
+  <input type="password" id="pwInput" placeholder="Şifre">
+  <button class="btn-primary" style="width:100%;" onclick="checkPw()">Giriş Yap</button>
+</div>
+
+<div id="panel">
+  <div class="wrap">
+    <h1>Bonus Ufku — Site Yönetimi</h1>
+    <p class="sub">Site ekle, düzenle, sırala. Değişiklikler anında yayına yansır.</p>
+    <div class="status-msg" id="statusMsg"></div>
+
+    <div class="add-form">
+      <input id="newName" placeholder="Site adı">
+      <input id="newBonus" placeholder="Bonus (örn: 500)">
+      <input id="newType" placeholder="Bonus türü" value="Deneme Bonusu">
+      <select id="newTag"><option value="trend">Trend</option><option value="popular">Popüler</option></select>
+      <input id="newLink" placeholder="Affiliate link">
+      <input id="newLogo" placeholder="Logo URL (opsiyonel)">
+      <button class="btn-primary" onclick="addSite()">+ Site Ekle</button>
+    </div>
+
+    <table>
+      <thead><tr><th>Sıra</th><th>Ad</th><th>Bonus</th><th>Tür</th><th>Etiket</th><th>Link</th><th>Logo</th><th>Aktif</th><th></th></tr></thead>
+      <tbody id="siteRows"></tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+/* ============ FIREBASE AYARLARI ============ */
+const firebaseConfig = {
+  apiKey: "AIzaSyDrXOlpkMV8Ee87PTHCCux5twOrzSypLKg",
+  authDomain: "bonusufku.firebaseapp.com",
+  projectId: "bonusufku",
+  storageBucket: "bonusufku.firebasestorage.app",
+  messagingSenderId: "1083260845030",
+  appId: "1:1083260845030:web:783038610c91103e123427"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+const ADMIN_PASSWORD = 'bonusufku2025'; // istersen değiştir
+
+function checkPw(){
+  const v = document.getElementById('pwInput').value;
+  if(v === ADMIN_PASSWORD){
+    document.getElementById('gate').style.display='none';
+    document.getElementById('panel').style.display='block';
+    loadRows();
+  } else {
+    alert('Yanlış şifre');
+  }
+}
+document.getElementById('pwInput').addEventListener('keydown', e=>{ if(e.key==='Enter') checkPw(); });
+
+function showStatus(msg){
+  const el = document.getElementById('statusMsg');
+  el.textContent = msg;
+  setTimeout(()=>{ if(el.textContent===msg) el.textContent=''; }, 2500);
+}
+
+async function loadRows(){
+  try{
+    const snap = await db.collection('sites').get();
+    const rows = snap.docs.map(d => ({id:d.id, ...d.data()}));
+    rows.sort((a,b) => (a.display_order||0) - (b.display_order||0));
+    document.getElementById('siteRows').innerHTML = rows.map(rowHtml).join('');
+  }catch(e){ showStatus('Hata: '+e.message); }
+}
+
+function rowHtml(s){
+  return `<tr data-id="${s.id}">
+    <td><input type="number" value="${s.display_order||0}" style="width:60px;" onchange="updateField('${s.id}','display_order',this.value,true)"></td>
+    <td><input value="${s.name||''}" onchange="updateField('${s.id}','name',this.value)"></td>
+    <td><input value="${s.bonus||''}" style="width:80px;" onchange="updateField('${s.id}','bonus',this.value)"></td>
+    <td><input value="${s.type||''}" onchange="updateField('${s.id}','type',this.value)"></td>
+    <td><select onchange="updateField('${s.id}','tag',this.value)">
+      <option value="trend" ${s.tag==='trend'?'selected':''}>Trend</option>
+      <option value="popular" ${s.tag==='popular'?'selected':''}>Popüler</option>
+    </select></td>
+    <td><input value="${s.link||''}" onchange="updateField('${s.id}','link',this.value)"></td>
+    <td><input value="${s.logo||''}" onchange="updateField('${s.id}','logo',this.value)"></td>
+    <td style="text-align:center;"><input type="checkbox" ${s.active?'checked':''} onchange="updateField('${s.id}','active',this.checked)"></td>
+    <td><div class="row-actions"><button class="btn-danger" onclick="deleteSite('${s.id}')">Sil</button></div></td>
+  </tr>`;
+}
+
+async function addSite(){
+  const payload = {
+    name: document.getElementById('newName').value.trim(),
+    bonus: document.getElementById('newBonus').value.trim(),
+    type: document.getElementById('newType').value.trim() || 'Deneme Bonusu',
+    tag: document.getElementById('newTag').value,
+    link: document.getElementById('newLink').value.trim() || '#',
+    logo: document.getElementById('newLogo').value.trim(),
+    active: true,
+    display_order: 0
+  };
+  if(!payload.name || !payload.bonus){ alert('Site adı ve bonus zorunlu.'); return; }
+  try{
+    await db.collection('sites').add(payload);
+  }catch(e){ showStatus('Hata: '+e.message); return; }
+  ['newName','newBonus','newLink','newLogo'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('newType').value='Deneme Bonusu';
+  showStatus('Site eklendi.');
+  loadRows();
+}
+
+async function updateField(id, field, value, isNumber){
+  const payload = {}; payload[field] = isNumber ? Number(value) : value;
+  try{
+    await db.collection('sites').doc(id).update(payload);
+  }catch(e){ showStatus('Hata: '+e.message); return; }
+  showStatus('Kaydedildi.');
+}
+
+async function deleteSite(id){
+  if(!confirm('Bu siteyi silmek istediğine emin misin?')) return;
+  try{
+    await db.collection('sites').doc(id).delete();
+  }catch(e){ showStatus('Hata: '+e.message); return; }
+  showStatus('Silindi.');
+  loadRows();
+}
+</script>
+</body>
+</html>
