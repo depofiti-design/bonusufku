@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Bonus Ufku — İstatistikler</title>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+<style>
+:root{--bg:#05070d;--card:#0a0e18;--card2:#0f1524;--cyan:#33d1ff;--green:#39ff88;--text:#eaf6ff;--muted:#7f93ab;--line:rgba(51,209,255,.18);--red:#ff5c7a;}
+*{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,'Inter',sans-serif;}
+body{background:var(--bg);color:var(--text);min-height:100vh;padding:24px;}
+.wrap{max-width:920px;margin:0 auto;}
+h1{font-size:20px;margin-bottom:4px;}
+p.sub{color:var(--muted);font-size:13px;margin-bottom:22px;}
+input{background:var(--card2);border:1px solid var(--line);color:var(--text);padding:9px 11px;border-radius:8px;font-size:13px;width:100%;}
+button{cursor:pointer;border:none;border-radius:8px;font-weight:700;font-size:13px;padding:9px 14px;}
+.btn-primary{background:linear-gradient(135deg,var(--green),var(--cyan));color:#04140c;}
+#gate{max-width:340px;margin:80px auto;text-align:center;}
+#gate input{margin-bottom:10px;}
+#panel{display:none;}
+.live-dot{width:7px;height:7px;border-radius:50%;background:var(--green);display:inline-block;box-shadow:0 0 8px var(--green);margin-right:6px;animation:pulse 1.4s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.35;}}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:22px;}
+.stat-card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;}
+.stat-card .num{font-family:'Sora',sans-serif;font-size:26px;font-weight:800;color:var(--green);}
+.stat-card .lbl{font-size:11.5px;color:var(--muted);margin-top:2px;}
+.section{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:16px;}
+.section h2{font-size:13px;color:var(--cyan);margin-bottom:12px;}
+table{width:100%;border-collapse:collapse;}
+th,td{padding:8px 10px;text-align:left;font-size:12px;border-bottom:1px solid var(--line);}
+th{color:var(--muted);font-weight:600;text-transform:uppercase;font-size:10px;letter-spacing:.4px;}
+.tag{display:inline-block;padding:2px 8px;border-radius:6px;font-size:10.5px;font-weight:700;}
+.tag.start{background:rgba(51,209,255,.18);color:var(--cyan);}
+.tag.open{background:rgba(57,255,136,.18);color:var(--green);}
+</style>
+</head>
+<body>
+
+<div id="gate">
+  <h1>Bonus Ufku İstatistikler</h1>
+  <p class="sub">Devam etmek için şifre gir.</p>
+  <input type="password" id="pwInput" placeholder="Şifre">
+  <button class="btn-primary" style="width:100%;" onclick="checkPw()">Giriş Yap</button>
+</div>
+
+<div id="panel">
+  <div class="wrap">
+    <h1><span class="live-dot"></span>Bonus Ufku — Canlı İstatistikler</h1>
+    <p class="sub" id="lastUpdate">Yükleniyor...</p>
+
+    <div class="grid">
+      <div class="stat-card"><div class="num" id="statStarts">–</div><div class="lbl">Toplam /start</div></div>
+      <div class="stat-card"><div class="num" id="statOpens">–</div><div class="lbl">Toplam site açılışı</div></div>
+      <div class="stat-card"><div class="num" id="statUsers">–</div><div class="lbl">Benzersiz kullanıcı</div></div>
+      <div class="stat-card"><div class="num" id="statToday">–</div><div class="lbl">Bugünkü olay</div></div>
+    </div>
+
+    <div class="section">
+      <h2>Kaynak bazlı dağılım (reklam/link takibi)</h2>
+      <table><thead><tr><th>Kaynak</th><th>Adet</th></tr></thead><tbody id="sourceRows"><tr><td colspan="2">Veri yok</td></tr></tbody></table>
+    </div>
+
+    <div class="section">
+      <h2>Son olaylar (canlı akış)</h2>
+      <table><thead><tr><th>Tip</th><th>Kullanıcı ID</th><th>Kaynak</th><th>Zaman</th></tr></thead><tbody id="feedRows"></tbody></table>
+    </div>
+  </div>
+</div>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyDrXOlpkMV8Ee87PTHCCux5twOrzSypLKg",
+  authDomain: "bonusufku.firebaseapp.com",
+  projectId: "bonusufku",
+  storageBucket: "bonusufku.firebasestorage.app",
+  messagingSenderId: "1083260845030",
+  appId: "1:1083260845030:web:783038610c91103e123427"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+const ADMIN_PASSWORD = 'bonusufku2025';
+let refreshTimer = null;
+
+function checkPw(){
+  const v = document.getElementById('pwInput').value;
+  if(v === ADMIN_PASSWORD){
+    document.getElementById('gate').style.display='none';
+    document.getElementById('panel').style.display='block';
+    loadStats();
+    refreshTimer = setInterval(loadStats, 5000);
+  } else {
+    alert('Yanlış şifre');
+  }
+}
+document.getElementById('pwInput').addEventListener('keydown', e=>{ if(e.key==='Enter') checkPw(); });
+
+async function loadStats(){
+  let data;
+  try{
+    const snap = await db.collection('events').orderBy('created_at','desc').limit(1000).get();
+    data = snap.docs.map(d=>d.data());
+  }catch(e){
+    document.getElementById('lastUpdate').textContent = 'Hata: '+e.message;
+    return;
+  }
+
+  const starts = data.filter(e=>e.event_type==='bot_start');
+  const opens = data.filter(e=>e.event_type==='site_open');
+  const uniqueUsers = new Set(data.map(e=>e.telegram_user_id).filter(Boolean));
+  const todayStr = new Date().toISOString().slice(0,10);
+  const todayCount = data.filter(e=>(e.created_at||'').slice(0,10)===todayStr).length;
+
+  document.getElementById('statStarts').textContent = starts.length;
+  document.getElementById('statOpens').textContent = opens.length;
+  document.getElementById('statUsers').textContent = uniqueUsers.size;
+  document.getElementById('statToday').textContent = todayCount;
+
+  const sourceCounts = {};
+  data.forEach(e=>{
+    const s = e.source || '(kaynaksız)';
+    sourceCounts[s] = (sourceCounts[s]||0)+1;
+  });
+  const sourceRows = Object.entries(sourceCounts).sort((a,b)=>b[1]-a[1]).slice(0,10)
+    .map(([s,c])=>`<tr><td>${s}</td><td>${c}</td></tr>`).join('');
+  document.getElementById('sourceRows').innerHTML = sourceRows || '<tr><td colspan="2">Veri yok</td></tr>';
+
+  const feedRows = data.slice(0,20).map(e=>{
+    const tag = e.event_type==='bot_start' ? '<span class="tag start">/start</span>' : '<span class="tag open">site açıldı</span>';
+    const time = e.created_at ? new Date(e.created_at).toLocaleString('tr-TR') : '-';
+    return `<tr><td>${tag}</td><td>${e.telegram_user_id||'-'}</td><td>${e.source||'-'}</td><td>${time}</td></tr>`;
+  }).join('');
+  document.getElementById('feedRows').innerHTML = feedRows || '<tr><td colspan="4">Henüz olay yok</td></tr>';
+
+  document.getElementById('lastUpdate').textContent = 'Son güncelleme: ' + new Date().toLocaleTimeString('tr-TR') + ' (5sn\'de bir yenilenir)';
+}
+</script>
+</body>
+</html>
