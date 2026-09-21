@@ -1,55 +1,51 @@
-# Bonus Ufku — Canlıya Alma Adımları
+# Bonus Ufku
 
-BonusRota'dan farklı olarak bu site **Firebase Firestore** kullanıyor (Supabase org'unda
-free plan proje limiti dolduğu için Gezicorn'daki gibi Firebase'e geçildi).
+Deneme bonusu listeleme sitesi + Telegram Mini App botu (`@bonusufku_webbot`). Statik HTML, Vercel'de yayında, veri Firebase Firestore'da.
 
-## 1. Firebase projesi
+- Site: https://bonusufku.vercel.app
+- Admin: `/admin/` (site ekle/düzenle/sil, şifre: `bonusufku2025`)
+- İstatistik: `/admin/stats.html` (aynı şifre; bot /start, site açılışı, kaynak dağılımı)
+- Gizlilik/sorumlu oyun: `/privacy.html`
+- Bot: https://t.me/bonusufku_webbot (Mini App: `t.me/bonusufku_webbot/appweb`)
 
-Zaten kurulu: proje adı `bonusufku`, Firestore veritabanı `eur3` (Avrupa) bölgesinde,
-Native mode, kurallar test modunda (`firestore.rules` — herkes okuyup yazabiliyor).
+## Mimari
 
-`index.html` ve `admin/index.html` içindeki `firebaseConfig` zaten doğru değerlerle dolu,
-elle bir şey doldurman gerekmiyor.
+- `index.html`, `admin/*.html`: Firebase compat SDK ile Firestore'a doğrudan bağlanır (`firebaseConfig`, proje `bonusufku`, veritabanı `eur3`)
+- `api/telegram-webhook.js`: Vercel serverless, Telegram webhook. `/start` gelince karşılama mesajı + "Siteye Gir" butonu gönderir, `events` koleksiyonuna `bot_start` yazar (Firestore REST)
+- `firestore.rules`: açık kurallar (test modu), koruma sadece admin şifre ekranı
 
-## 2. Firestore koleksiyonu (`sites`)
+## Firestore koleksiyonları
+
+- `sites`: `name, bonus, type, tag (trend|popular), link, logo, display_order, active`
+- `events`: `event_type (bot_start|site_open), telegram_user_id, source, created_at`
+
+Belge ID'leri Firestore'un otomatik ürettiği string ID'ler.
+
+## Vercel ortam değişkenleri
+
+- `TELEGRAM_BOT_TOKEN`: BotFather token
+- `TELEGRAM_WEBHOOK_SECRET`: webhook doğrulama gizli anahtarı
+
+Değiştirince redeploy gerekir.
+
+## Webhook kurulumu
 
 ```
-sites (
-  name string,
-  bonus string,
-  type string,
-  tag string,           -- 'trend' | 'popular'
-  link string,
-  logo string,
-  display_order number,
-  active boolean
-)
+curl "https://api.telegram.org/bot<TOKEN>/setWebhook" \
+  -d "url=https://bonusufku.vercel.app/api/telegram-webhook" \
+  -d "secret_token=<TELEGRAM_WEBHOOK_SECRET>"
 ```
 
-Belge ID'leri Firestore'un otomatik ürettiği string ID'ler (Supabase'deki gibi sayısal
-`id` yok). Admin panel bunu otomatik yönetiyor.
-
-## 3. GitHub'a it
+## Firestore kuralları deploy
 
 ```
-cd ~/bonus-sites/bonusufku
-git init
-git add .
-git commit -m "Bonus Ufku ilk sürüm (Firebase)"
-gh repo create depofiti-design/bonusufku --public --source=. --push
+npx firebase deploy --only firestore:rules --project bonusufku
 ```
 
-## 4. Vercel'e deploy et
+## Kaynak takibi
 
-- vercel.com → Add New Project → GitHub reposunu seç → Deploy
-- Framework: **Other** / **Static**
-- Adres: `bonusufku.vercel.app`
+Reklam/link başına `t.me/bonusufku_webbot?start=<kaynak>` kullan. `<kaynak>` stats sayfasında ayrı satır olarak görünür.
 
-## 5. Site ekleme / düzenleme
+## Not
 
-`bonusufku.vercel.app/admin/` → şifre (`bonusufku2025`) → siteleri yönet.
-
----
-**Not:** Firestore'a bağlanılamazsa sayfa dosya içindeki yedek listeye düşer, site boş görünmez.
-**Not 2:** Firestore kuralları test modunda (herkes okuyup yazabilir) — admin panel şifre
-korumalı ama veritabanı seviyesinde ekstra kilit yok, Gezicorn/BonusRota ile aynı risk toleransı.
+Firestore'a bağlanılamazsa `index.html` içindeki yedek `SITES` listesi gösterilir. Admin'den yapılan değişiklikler yedek listeye yansımaz. Kurallar test modunda (herkes okuyup yazabilir), BonusRota ile aynı risk toleransı.
