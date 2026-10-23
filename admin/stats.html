@@ -34,6 +34,10 @@ th{color:var(--muted);font-weight:600;text-transform:uppercase;font-size:10px;le
 .tag{display:inline-block;padding:2px 8px;border-radius:6px;font-size:10.5px;font-weight:700;}
 .tag.start{background:rgba(51,209,255,.18);color:var(--cyan);}
 .tag.open{background:rgba(57,255,136,.18);color:var(--green);}
+.tag.click{background:rgba(255,196,0,.18);color:#ffc400;}
+.tag.spin{background:rgba(255,255,255,.12);color:var(--muted);}
+.tag.chest{background:rgba(255,92,122,.18);color:var(--red);}
+.mono{font-family:monospace;font-size:11px;color:var(--muted);}
 </style>
 </head>
 <body>
@@ -53,8 +57,15 @@ th{color:var(--muted);font-weight:600;text-transform:uppercase;font-size:10px;le
     <div class="grid">
       <div class="stat-card"><div class="num" id="statStarts">–</div><div class="lbl">Toplam /start</div></div>
       <div class="stat-card"><div class="num" id="statOpens">–</div><div class="lbl">Toplam site açılışı</div></div>
+      <div class="stat-card"><div class="num" id="statClicks">–</div><div class="lbl">Toplam bonus tıklaması</div></div>
       <div class="stat-card"><div class="num" id="statUsers">–</div><div class="lbl">Benzersiz kullanıcı</div></div>
+      <div class="stat-card"><div class="num" id="statIps">–</div><div class="lbl">Benzersiz IP</div></div>
       <div class="stat-card"><div class="num" id="statToday">–</div><div class="lbl">Bugünkü olay</div></div>
+    </div>
+
+    <div class="section">
+      <h2>En çok tıklanan siteler</h2>
+      <table><thead><tr><th>Site</th><th>Tıklama</th></tr></thead><tbody id="siteClickRows"><tr><td colspan="2">Veri yok</td></tr></tbody></table>
     </div>
 
     <div class="section">
@@ -63,8 +74,8 @@ th{color:var(--muted);font-weight:600;text-transform:uppercase;font-size:10px;le
     </div>
 
     <div class="section">
-      <h2>Son olaylar (canlı akış)</h2>
-      <table><thead><tr><th>Tip</th><th>Kullanıcı ID</th><th>Kaynak</th><th>Zaman</th></tr></thead><tbody id="feedRows"></tbody></table>
+      <h2>Son olaylar (canlı akış, ziyaretçi IP dahil)</h2>
+      <table><thead><tr><th>Tip</th><th>Kullanıcı ID</th><th>IP</th><th>Kaynak/Site</th><th>Zaman</th></tr></thead><tbody id="feedRows"></tbody></table>
     </div>
   </div>
 </div>
@@ -108,14 +119,27 @@ async function loadStats(){
 
   const starts = data.filter(e=>e.event_type==='bot_start');
   const opens = data.filter(e=>e.event_type==='site_open');
+  const clicks = data.filter(e=>e.event_type==='site_click');
   const uniqueUsers = new Set(data.map(e=>e.telegram_user_id).filter(Boolean));
+  const uniqueIps = new Set(data.map(e=>e.ip).filter(Boolean));
   const todayStr = new Date().toISOString().slice(0,10);
   const todayCount = data.filter(e=>(e.created_at||'').slice(0,10)===todayStr).length;
 
   document.getElementById('statStarts').textContent = starts.length;
   document.getElementById('statOpens').textContent = opens.length;
+  document.getElementById('statClicks').textContent = clicks.length;
   document.getElementById('statUsers').textContent = uniqueUsers.size;
+  document.getElementById('statIps').textContent = uniqueIps.size;
   document.getElementById('statToday').textContent = todayCount;
+
+  const siteClickCounts = {};
+  clicks.forEach(e=>{
+    const s = e.site_name || '(bilinmiyor)';
+    siteClickCounts[s] = (siteClickCounts[s]||0)+1;
+  });
+  const siteClickRows = Object.entries(siteClickCounts).sort((a,b)=>b[1]-a[1]).slice(0,15)
+    .map(([s,c])=>`<tr><td>${s}</td><td>${c}</td></tr>`).join('');
+  document.getElementById('siteClickRows').innerHTML = siteClickRows || '<tr><td colspan="2">Henüz tıklama yok</td></tr>';
 
   const sourceCounts = {};
   data.forEach(e=>{
@@ -126,12 +150,21 @@ async function loadStats(){
     .map(([s,c])=>`<tr><td>${s}</td><td>${c}</td></tr>`).join('');
   document.getElementById('sourceRows').innerHTML = sourceRows || '<tr><td colspan="2">Veri yok</td></tr>';
 
-  const feedRows = data.slice(0,20).map(e=>{
-    const tag = e.event_type==='bot_start' ? '<span class="tag start">/start</span>' : '<span class="tag open">site açıldı</span>';
+  const TAG_LABELS = {
+    bot_start: {cls:'start', label:'/start'},
+    site_open: {cls:'open', label:'site açıldı'},
+    site_click: {cls:'click', label:'bonus tıklandı'},
+    wheel_spin: {cls:'spin', label:'çark çevrildi'},
+    chest_open: {cls:'chest', label:'sandık açıldı'},
+  };
+  const feedRows = data.slice(0,30).map(e=>{
+    const t = TAG_LABELS[e.event_type] || {cls:'open', label:e.event_type||'?'};
+    const tag = `<span class="tag ${t.cls}">${t.label}</span>`;
     const time = e.created_at ? new Date(e.created_at).toLocaleString('tr-TR') : '-';
-    return `<tr><td>${tag}</td><td>${e.telegram_user_id||'-'}</td><td>${e.source||'-'}</td><td>${time}</td></tr>`;
+    const extra = e.site_name || e.source || '-';
+    return `<tr><td>${tag}</td><td>${e.telegram_user_id||'-'}</td><td class="mono">${e.ip||'-'}</td><td>${extra}</td><td>${time}</td></tr>`;
   }).join('');
-  document.getElementById('feedRows').innerHTML = feedRows || '<tr><td colspan="4">Henüz olay yok</td></tr>';
+  document.getElementById('feedRows').innerHTML = feedRows || '<tr><td colspan="5">Henüz olay yok</td></tr>';
 
   document.getElementById('lastUpdate').textContent = 'Son güncelleme: ' + new Date().toLocaleTimeString('tr-TR') + ' (5sn\'de bir yenilenir)';
 }

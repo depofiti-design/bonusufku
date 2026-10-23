@@ -244,7 +244,7 @@ function renderCard(s){
       <div class="site-bonus">${s.bonus} <span style="font-size:11px;color:var(--muted);font-family:'IBM Plex Sans';">TL</span></div>
       <div class="site-type">${s.type}</div>
     </div>
-    <a href="${s.link}" target="_blank" class="cta-btn">Bonusu Al</a>
+    <a href="${s.link}" target="_blank" class="cta-btn" data-site="${s.name}">Bonusu Al</a>
   </div>`;
 }
 function render(filter='all'){
@@ -306,24 +306,31 @@ async function loadSites(){
 }
 loadSites();
 
-/* ============ ANALİTİK: site açılışını kaydet ============ */
-function logSiteOpen(){
+/* ============ ANALİTİK: ziyaretçi + tıklama + etkileşim kaydı ============
+   Doğrudan Firestore'a yazmak yerine /api/track'e POST atıyoruz; bu sayede
+   Vercel tarafında gerçek istemci IP'si de olaya ekleniyor (admin/stats.html'de görünür). */
+function trackEvent(eventType, extra){
   try{
     const tg = window.Telegram && window.Telegram.WebApp;
     const userId = tg && tg.initDataUnsafe && tg.initDataUnsafe.user ? tg.initDataUnsafe.user.id : null;
     const source = (tg && tg.initDataUnsafe && tg.initDataUnsafe.start_param) || null;
-    db.collection('events').add({
-      event_type:'site_open',
-      telegram_user_id:userId,
-      source,
-      created_at: new Date().toISOString(),
+    fetch('/api/track', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify(Object.assign({event_type:eventType, telegram_user_id:userId, source}, extra||{})),
     }).catch(()=>{});
   }catch(e){}
 }
-logSiteOpen();
+/* Bonus linkine tıklama: site kartları + çark/sandık sonuç linkleri (data-site) */
+document.addEventListener('click', function(e){
+  const el = e.target.closest('a[data-site]');
+  if(el) trackEvent('site_click', {site_name: el.dataset.site});
+});
+trackEvent('site_open');
 let spinning=false;
 function spinWheel(){
   if(spinning) return; spinning=true;
+  trackEvent('wheel_spin');
   document.getElementById('spinBtn').textContent='Çevriliyor...';
   const idx = Math.floor(Math.random()*8);
   const rot = 360*5 + (360 - (idx*45+22.5));
@@ -335,6 +342,7 @@ function spinWheel(){
     document.getElementById('winPrize').textContent = w.bonus + ' TL';
     document.getElementById('winSite').textContent = w.name;
     document.getElementById('winLink').href = w.link;
+    document.getElementById('winLink').dataset.site = w.name;
     openModal('winModal');
     spinning=false;
     document.getElementById('spinBtn').textContent='Çevir';
@@ -345,6 +353,7 @@ function spinWheel(){
 
 const chestClosedSVG = `<svg viewBox="0 0 64 64"><rect x="6" y="30" width="52" height="30" rx="6" fill="#132038" stroke="#0a1220" stroke-width="2"/><rect x="6" y="38" width="52" height="5" fill="#1a2c4d"/><rect x="26" y="34" width="12" height="14" rx="4" fill="#39ff88" stroke="#2ee377" stroke-width="1"/><path d="M6 30 L32 8 L58 30 L58 36 L32 16 L6 36 Z" fill="#1a2c4d" stroke="#0a1220" stroke-width="2"/></svg>`;
 function pickChest(idx){
+  trackEvent('chest_open');
   [0,1,2].forEach(i=>{
     const c=document.getElementById('chest'+i);
     c.disabled=true;
@@ -356,6 +365,7 @@ function pickChest(idx){
     document.getElementById('wonAmount').textContent = w.bonus+' TL';
     document.getElementById('wonSite').textContent = w.name;
     document.getElementById('wonLink').href = w.link;
+    document.getElementById('wonLink').dataset.site = w.name;
     document.getElementById('treasureResult').style.display='block';
   },1200);
 }
